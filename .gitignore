@@ -106,3 +106,4 @@ venv.bak/
 
 #Database
 Python/ENEM Analysis/database.cfg
+Python/ENEM Analysis/Data/microdados_enem2017/*.*
