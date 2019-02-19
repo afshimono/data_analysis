@@ -1,7 +1,7 @@
 import os
 import sys
 import configparser
-from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger
+from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -46,7 +46,7 @@ class Exame(Base):
 		primaryjoin=residencia_id==Local.id,
                                 post_update=True) 
 	ano = Column(Integer,nullable=False)
-	idade = Column(Integer,nullable=False)
+	idade = Column(Integer,nullable=True)
 	racial_id = Column(Integer,ForeignKey('racial.id'))
 	racial = relationship(Racial,
 		primaryjoin=racial_id==Racial.id,
@@ -55,7 +55,19 @@ class Exame(Base):
 	nacional = relationship(Nacionalidade,
 		primaryjoin=nacional_id==Nacionalidade.id,
                                 post_update=True) 
-	sexo = Column(String(1),nullable=False)
+	casado_id = Column(Integer,ForeignKey('estadocivil.id'))
+	casado = relationship(EstadoCivil,
+		primaryjoin=casado_id==EstadoCivil.id,
+                                post_update=True) 
+	sexo = Column(String(1),nullable=True)
+
+	nota_cn = Column(Float,nullable=False)
+	nota_ch = Column(Float,nullable=False)
+	nota_lc = Column(Float,nullable=False)
+	nota_mt = Column(Float,nullable=False)
+	nota_red = Column(Float,nullable=False)
+
+
 
 def populate_basic_tables(engine):
 	Session = sessionmaker(bind=engine)
