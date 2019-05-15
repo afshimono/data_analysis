@@ -1,7 +1,7 @@
 import os
 import sys
 import configparser
-from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, Float
+from sqlalchemy import Column, ForeignKey, Integer, String, BigInteger, Float, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -14,6 +14,16 @@ class Local(Base):
 	id = Column(Integer, primary_key=True)
 	municipio = Column(String(250),nullable=False)
 	estado = Column(String(5),nullable=False)
+
+class EnsinoMedio(Base):
+	__tablename__ = 'ensinomedio'
+	id = Column(Integer, primary_key=True)
+	descricao = Column(String(250),nullable=False)
+
+class TipoEnsinoMedio(Base):
+	__tablename__ = 'tipoensinomedio'
+	id = Column(Integer, primary_key=True)
+	descricao = Column(String(250),nullable=False)
 
 class Racial(Base):
 	__tablename__ = 'racial'
@@ -34,21 +44,21 @@ class Exame(Base):
 	__tablename__ = 'exame'
 	candidato_id = Column(BigInteger, primary_key=True)
 	exame_local_id = Column(Integer,ForeignKey('local.id'))
-	exame_local = relationship(Local,
+	exame_local = relationship(Local,uselist=False,
 		primaryjoin=exame_local_id==Local.id,
                                 post_update=True)       
 	local_nasc_id = Column(Integer,ForeignKey('local.id'))
-	local_nasc = relationship(Local,
+	local_nasc = relationship(Local,uselist=False,
 		primaryjoin=local_nasc_id==Local.id,
                                 post_update=True) 
 	residencia_id = Column(Integer,ForeignKey('local.id'))
-	residencia = relationship(Local,
+	residencia = relationship(Local,uselist=False,
 		primaryjoin=residencia_id==Local.id,
                                 post_update=True) 
 	ano = Column(Integer,nullable=False)
 	idade = Column(Integer,nullable=True)
 	racial_id = Column(Integer,ForeignKey('racial.id'))
-	racial = relationship(Racial,
+	racial = relationship(Racial,uselist=False,
 		primaryjoin=racial_id==Racial.id,
                                 post_update=True) 
 	nacional_id = Column(Integer,ForeignKey('nacionalidade.id'))
@@ -58,7 +68,15 @@ class Exame(Base):
 	casado_id = Column(Integer,ForeignKey('estadocivil.id'))
 	casado = relationship(EstadoCivil,
 		primaryjoin=casado_id==EstadoCivil.id,
+                                post_update=True)
+	ensinomedio_id = Column(Integer,ForeignKey('ensinomedio.id'))
+	ensinomedio = relationship(EnsinoMedio,
+		primaryjoin=ensinomedio_id==EnsinoMedio.id,
                                 post_update=True) 
+	tipoensinomedio_id = Column(Integer,ForeignKey('tipoensinomedio.id'))
+	tipoensinomedio = relationship(TipoEnsinoMedio,
+		primaryjoin=tipoensinomedio_id==TipoEnsinoMedio.id,
+                                post_update=True)  
 	sexo = Column(String(1),nullable=True)
 
 	nota_cn = Column(Float,nullable=False)
@@ -66,6 +84,9 @@ class Exame(Base):
 	nota_lc = Column(Float,nullable=False)
 	nota_mt = Column(Float,nullable=False)
 	nota_red = Column(Float,nullable=False)
+
+	treineiro = Column(Boolean, nullable=True)
+
 
 
 
@@ -87,7 +108,15 @@ def populate_basic_tables(engine):
 		Racial(id=2,racial_id='Preta'),
 		Racial(id=3,racial_id='Parda'),
 		Racial(id=4,racial_id='Amarela'),
-		Racial(id=5,racial_id='Indigena')])
+		Racial(id=5,racial_id='Indigena'),
+		EnsinoMedio(id=1,descricao='Já concluí o Ensino Médio'),
+		EnsinoMedio(id=2,descricao='Estou cursando e concluirei o Ensino Médio em 2017'),
+		EnsinoMedio(id=3,descricao='Estou cursando e concluirei o Ensino Médio após 2017'),
+		EnsinoMedio(id=4,descricao='Não concluí e não estou cursando o Ensino Médio'),
+		TipoEnsinoMedio(id=1,descricao='Não Respondeu'),
+		TipoEnsinoMedio(id=2,descricao='Publica'),
+		TipoEnsinoMedio(id=3,descricao='Privada'),
+		TipoEnsinoMedio(id=4,descricao='Exterior')])
 	session.commit()
 	session.close()
 
